@@ -1,0 +1,329 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Library Modules &mdash; intertidal-locator 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="intertidal-locator documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            intertidal-locator
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Library Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#intertidal_locator.crop_cell"><code class="docutils literal notranslate"><span class="pre">crop_cell()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#intertidal_locator.download_data"><code class="docutils literal notranslate"><span class="pre">download_data()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#intertidal_locator.find_area_cells"><code class="docutils literal notranslate"><span class="pre">find_area_cells()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#intertidal_locator.find_point_cell"><code class="docutils literal notranslate"><span class="pre">find_point_cell()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#intertidal_locator.get_intertidal_area"><code class="docutils literal notranslate"><span class="pre">get_intertidal_area()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#intertidal_locator.merge_crops"><code class="docutils literal notranslate"><span class="pre">merge_crops()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#intertidal_locator.read_cell"><code class="docutils literal notranslate"><span class="pre">read_cell()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">intertidal-locator</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Library Modules</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-intertidal_locator">
+<span id="library-modules"></span><h1>Library Modules<a class="headerlink" href="#module-intertidal_locator" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="intertidal_locator.crop_cell">
+<span class="sig-prename descclassname"><span class="pre">intertidal_locator.</span></span><span class="sig-name descname"><span class="pre">crop_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_lon_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_lat_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/intertidal_locator.html#crop_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#intertidal_locator.crop_cell" title="Link to this definition"></a></dt>
+<dd><p>Crops the cell image to the specified area.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell</strong> (<em>(</em><em>PIL.Image.Image</em><em>)</em>) – The cell image to be cropped.</p></li>
+<li><p><strong>cell_lon_min</strong> (<em>(</em><em>int</em><em>)</em>) – Minimum longitude of the cell.</p></li>
+<li><p><strong>cell_lat_max</strong> (<em>(</em><em>int</em><em>)</em>) – Maximum latitude of the cell.</p></li>
+<li><p><strong>lon_min</strong> (<em>(</em><em>float</em><em>)</em>) – Minimum longitude of the area.</p></li>
+<li><p><strong>lat_min</strong> (<em>(</em><em>float</em><em>)</em>) – Minimum latitude of the area.</p></li>
+<li><p><strong>lon_max</strong> (<em>(</em><em>float</em><em>)</em>) – Maximum longitude of the area.</p></li>
+<li><p><strong>lat_max</strong> (<em>(</em><em>float</em><em>)</em>) – Maximum latitude of the area.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The data read from the specified area of the
+Image, as a numpy array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(numpy.ndarray) cropped_cell_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="intertidal_locator.download_data">
+<span class="sig-prename descclassname"><span class="pre">intertidal_locator.</span></span><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datadir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">makedirs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/intertidal_locator.html#download_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#intertidal_locator.download_data" title="Link to this definition"></a></dt>
+<dd><p>Downloads and extracts the intertidal data from Global
+Intertidal Change website (www.intertidal.app).</p>
+<p>Downloading all periods is about 0.9 Go, however,
+after extraction it goes up, about 44.3 Go (very
+sparse data). You need 5 Go of free space per period.</p>
+<p>This function iterates through a predefined list of
+time periods, constructs the corresponding download
+URLs, downloads the zip files for each period,
+extracts the contents into the specified destination
+folder, and deletes the zip files after extraction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>datadir</strong> (<em>(</em><em>str</em><em>)</em>) – The directory where downloaded files will be
+extracted.</p></li>
+<li><p><strong>periods=None</strong> (<em>(</em><em>list</em><em>[</em><em>str</em><em>]</em><em>)</em>) – List of periods to download. If None, download
+all available periods.</p></li>
+<li><p><strong>makedirs=True</strong> (<em>(</em><em>bool</em><em>)</em>) – If True and folderpath’s directory does not
+exist, create it.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>MemoryError:</strong> – Free space on your disk is too small for the
+    periods you want to download.</p></li>
+<li><p><strong>ConnectionError:</strong> – Fail to download a period zip file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="intertidal_locator.find_area_cells">
+<span class="sig-prename descclassname"><span class="pre">intertidal_locator.</span></span><span class="sig-name descname"><span class="pre">find_area_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lon_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/intertidal_locator.html#find_area_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#intertidal_locator.find_area_cells" title="Link to this definition"></a></dt>
+<dd><p>Finds all cells that intersect with a given rectangle
+area defined by its longitude and latitude boundaries.</p>
+<p>The longitude must be between [-180,180] while the
+latitude must be between [-60,60] (the whole earth
+latitude is not covered, for more information refer to
+<a class="reference external" href="http://dx.doi.org/10.1038/s41586-018-0805-8">http://dx.doi.org/10.1038/s41586-018-0805-8</a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lon_min</strong> (<em>(</em><em>float</em><em>)</em>) – Minimum longitude of the area.</p></li>
+<li><p><strong>lat_min</strong> (<em>(</em><em>float</em><em>)</em>) – Minimum latitude of the area.</p></li>
+<li><p><strong>lon_max</strong> (<em>(</em><em>float</em><em>)</em>) – Maximum longitude of the area.</p></li>
+<li><p><strong>lat_max</strong> (<em>(</em><em>float</em><em>)</em>) – Maximum latitude of the area.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tuples, where each tuple
+represents the (cell_lon_min, cell_lat_max)
+of a cell that intersects the area.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(list[tuple[int,int]]) cells</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="intertidal_locator.find_point_cell">
+<span class="sig-prename descclassname"><span class="pre">intertidal_locator.</span></span><span class="sig-name descname"><span class="pre">find_point_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/intertidal_locator.html#find_point_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#intertidal_locator.find_point_cell" title="Link to this definition"></a></dt>
+<dd><p>Finds which cell contains a single point (lon, lat).</p>
+<p>The longitude must be between [-180,180] while the
+latitude must be between [-60,60] (the whole earth
+latitude is not covered, for more information refer to
+<a class="reference external" href="http://dx.doi.org/10.1038/s41586-018-0805-8">http://dx.doi.org/10.1038/s41586-018-0805-8</a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lon</strong> (<em>(</em><em>float</em><em>)</em>) – Longitude of the point.</p></li>
+<li><p><strong>lat</strong> (<em>(</em><em>float</em><em>)</em>) – Latitude of the point.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple that represents the (cell_lon_min,
+cell_lat_max) coordinate.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(tuple[int,int]) cell_coord</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError:</strong> – If the area is outside the valid latitude range
+    or if the longitude is not in valid format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="intertidal_locator.get_intertidal_area">
+<span class="sig-prename descclassname"><span class="pre">intertidal_locator.</span></span><span class="sig-name descname"><span class="pre">get_intertidal_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lon_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datadir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'2014-2016'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/intertidal_locator.html#get_intertidal_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#intertidal_locator.get_intertidal_area" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the intertidal area data for the specified
+area.</p>
+<p>The longitude must be between [-180,180] while the
+latitude must be between [-60,60] (the whole earth
+latitude is not covered, for more information refer to
+<a class="reference external" href="http://dx.doi.org/10.1038/s41586-018-0805-8">http://dx.doi.org/10.1038/s41586-018-0805-8</a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lon_min</strong> (<em>(</em><em>float</em><em>)</em>) – Minimum longitude of the area.</p></li>
+<li><p><strong>lat_min</strong> (<em>(</em><em>float</em><em>)</em>) – Minimum latitude of the area.</p></li>
+<li><p><strong>lon_max</strong> (<em>(</em><em>float</em><em>)</em>) – Maximum longitude of the area.</p></li>
+<li><p><strong>lat_max</strong> (<em>(</em><em>float</em><em>)</em>) – Maximum latitude of the area.</p></li>
+<li><p><strong>datadir</strong> (<em>(</em><em>str</em><em>)</em>) – The directory path where the data files are
+stored.</p></li>
+<li><p><strong>period='2014-2016'</strong> (<em>(</em><em>str</em><em>)</em>) – The data period to retrieve.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The array representing the intertidal area for
+the specified area.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(numpy.ndarray) intertidal_area</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="intertidal_locator.merge_crops">
+<span class="sig-prename descclassname"><span class="pre">intertidal_locator.</span></span><span class="sig-name descname"><span class="pre">merge_crops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cropped_cell_arrays</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/intertidal_locator.html#merge_crops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#intertidal_locator.merge_crops" title="Link to this definition"></a></dt>
+<dd><p>Merges multiple cropped cell arrays into a single
+array based on their spatial coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cropped_cell_arrays</strong> (<em>(</em><em>list</em><em>[</em><em>numpy.ndarray</em><em>]</em><em>)</em>) – A list of cropped cell arrays to be merged.</p></li>
+<li><p><strong>(</strong><strong>list</strong><strong>[</strong><strong>tuple</strong><strong>[</strong><strong>int</strong> – A list of tuples containing the cell
+coordinate (cell_lon_min, cell_lat_max)
+corresponding to each cropped cell array.</p></li>
+<li><p><strong>cell_coords</strong> (<em>int</em><em>]</em><em>]</em><em>)</em>) – A list of tuples containing the cell
+coordinate (cell_lon_min, cell_lat_max)
+corresponding to each cropped cell array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The merged array combining the cropped cell
+arrays.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(numpy.ndarray) merged_cropped_cell_array</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError:</strong> – If the number of cell coordinates does not
+    match the number of cropped cell arrays or
+    if the list is empty.</p></li>
+<li><p><strong>NotImplementedError:</strong> – If the number of cropped cell arrays is not
+    1, 2, or 4. Not 3 because the area is a
+    rectangle. Not more because it would require
+    too much RAM for most use cases.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="intertidal_locator.read_cell">
+<span class="sig-prename descclassname"><span class="pre">intertidal_locator.</span></span><span class="sig-name descname"><span class="pre">read_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_lon_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_lat_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datadir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'2014-2016'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Image</span></span></span><a class="reference internal" href="_modules/intertidal_locator.html#read_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#intertidal_locator.read_cell" title="Link to this definition"></a></dt>
+<dd><p>Reads and returns a cell image file based on cell
+coordinate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_lon_min</strong> (<em>(</em><em>int</em><em>)</em>) – Minimum longitude of the cell.</p></li>
+<li><p><strong>cell_lat_max</strong> (<em>(</em><em>int</em><em>)</em>) – Maximum latitude of the cell.</p></li>
+<li><p><strong>datadir</strong> (<em>(</em><em>str</em><em>)</em>) – Path to directory containing data.</p></li>
+<li><p><strong>period='2014-2016'</strong> (<em>(</em><em>str</em><em>)</em>) – The data period to read.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The image object read from the specified file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(PIL.Image.Image) cell</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="intertidal-locator documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, MIA lab, La Rochelle University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

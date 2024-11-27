@@ -1,0 +1,607 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>intertidal_locator &mdash; intertidal-locator 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            intertidal-locator
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Library Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">intertidal-locator</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">intertidal_locator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for intertidal_locator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+
+
+
+<span class="n">LON_STEP</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">LAT_STEP</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="n">REQUIRED_IMAGE_PIXELS</span> <span class="o">=</span> <span class="mi">74213</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;https://storage.googleapis.com/uq-intertidal/&quot;</span> \
+    <span class="s2">&quot;v1_1/global_intertidal/&quot;</span>
+
+<span class="n">PERIODS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;1984-1986&quot;</span><span class="p">,</span> <span class="s2">&quot;1987-1989&quot;</span><span class="p">,</span> <span class="s2">&quot;1990-1992&quot;</span><span class="p">,</span> 
+           <span class="s2">&quot;1993-1995&quot;</span><span class="p">,</span> <span class="s2">&quot;1996-1998&quot;</span><span class="p">,</span> <span class="s2">&quot;1999-2001&quot;</span><span class="p">,</span> 
+           <span class="s2">&quot;2002-2004&quot;</span><span class="p">,</span> <span class="s2">&quot;2005-2007&quot;</span><span class="p">,</span> <span class="s2">&quot;2008-2010&quot;</span><span class="p">,</span> 
+           <span class="s2">&quot;2011-2013&quot;</span><span class="p">,</span> <span class="s2">&quot;2014-2016&quot;</span><span class="p">]</span>
+
+<span class="n">DISK_SPACE_PER_PERIOD</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># Go</span>
+
+
+
+<span class="k">if</span> <span class="n">Image</span><span class="o">.</span><span class="n">MAX_IMAGE_PIXELS</span> <span class="o">&lt;</span> <span class="n">REQUIRED_IMAGE_PIXELS</span><span class="p">:</span>
+    <span class="n">Image</span><span class="o">.</span><span class="n">MAX_IMAGE_PIXELS</span> <span class="o">=</span> <span class="n">REQUIRED_IMAGE_PIXELS</span>
+
+
+
+<div class="viewcode-block" id="download_data">
+<a class="viewcode-back" href="../modules.html#intertidal_locator.download_data">[docs]</a>
+<span class="k">def</span> <span class="nf">download_data</span><span class="p">(</span><span class="n">datadir</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                  <span class="n">periods</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                  <span class="n">makedirs</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Downloads and extracts the intertidal data from Global </span>
+<span class="sd">    Intertidal Change website (www.intertidal.app).</span>
+
+<span class="sd">    Downloading all periods is about 0.9 Go, however, </span>
+<span class="sd">    after extraction it goes up, about 44.3 Go (very </span>
+<span class="sd">    sparse data). You need 5 Go of free space per period.</span>
+
+<span class="sd">    This function iterates through a predefined list of </span>
+<span class="sd">    time periods, constructs the corresponding download </span>
+<span class="sd">    URLs, downloads the zip files for each period, </span>
+<span class="sd">    extracts the contents into the specified destination </span>
+<span class="sd">    folder, and deletes the zip files after extraction.</span>
+
+<span class="sd">    PARAMETERS</span>
+<span class="sd">    ----------</span>
+<span class="sd">        (str) datadir: </span>
+<span class="sd">            The directory where downloaded files will be </span>
+<span class="sd">            extracted.</span>
+
+<span class="sd">        (list[str]) periods=None: </span>
+<span class="sd">            List of periods to download. If None, download </span>
+<span class="sd">            all available periods.</span>
+
+<span class="sd">        (bool) makedirs=True: </span>
+<span class="sd">            If True and folderpath&#39;s directory does not </span>
+<span class="sd">            exist, create it.</span>
+
+<span class="sd">    RETURNS</span>
+<span class="sd">    -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">    RAISES</span>
+<span class="sd">    ------</span>
+<span class="sd">        MemoryError: </span>
+<span class="sd">            Free space on your disk is too small for the </span>
+<span class="sd">            periods you want to download.</span>
+
+<span class="sd">        ConnectionError:</span>
+<span class="sd">            Fail to download a period zip file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create directory if not existing (and makedirs=True)</span>
+    <span class="k">if</span> <span class="n">makedirs</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
+
+    <span class="c1"># Take all periods if None, and if empty raise an err</span>
+    <span class="k">if</span> <span class="n">periods</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">periods</span> <span class="o">=</span> <span class="n">PERIODS</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;periods must not be empty.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Check disk free space</span>
+    <span class="n">needed_space</span> <span class="o">=</span> <span class="n">DISK_SPACE_PER_PERIOD</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">)</span> <span class="c1"># Go</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">statvfs</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
+    <span class="n">free_space</span> <span class="o">=</span> <span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">f_frsize</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">f_bfree</span>
+                  <span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># Go</span>
+    <span class="k">if</span> <span class="n">free_space</span> <span class="o">&lt;</span> <span class="n">needed_space</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">MemoryError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;To download </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+                           <span class="s2">&quot;periods, you need at least &quot;</span>
+                          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">needed_space</span><span class="si">}</span><span class="s2"> Go of free &quot;</span>
+                           <span class="s2">&quot;space on disk, you only have &quot;</span>
+                          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">free_space</span><span class="si">}</span><span class="s2"> Go for </span><span class="si">{</span><span class="n">datadir</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Iterate over targeted periods to download them</span>
+    <span class="k">for</span> <span class="n">period</span> <span class="ow">in</span> <span class="n">periods</span><span class="p">:</span>
+        <span class="c1"># Skip if a non-empty directory exists</span>
+        <span class="n">period_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">period</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">period_directory</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">period_directory</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Non-empty </span><span class="si">{</span><span class="n">period</span><span class="si">}</span><span class="s2"> directory found&quot;</span>
+                      <span class="sa">f</span><span class="s2">&quot;, skip </span><span class="si">{</span><span class="n">period</span><span class="si">}</span><span class="s2"> download.&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+        
+        <span class="c1"># Download file</span>
+        <span class="n">period_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">URL</span><span class="si">}{</span><span class="n">period</span><span class="si">}</span><span class="s2">.zip&quot;</span>
+        <span class="n">local_zip_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> 
+                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">period_url</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">period_url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download &quot;</span>
+                                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">period_url</span><span class="si">}</span><span class="s2"> - Status &quot;</span>
+                                   <span class="s2">&quot;code: &quot;</span>
+                                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Save file</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">local_zip_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+
+        <span class="c1"># Unzip file</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">local_zip_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span>
+                                <span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
+            <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded </span><span class="si">{</span><span class="n">period</span><span class="si">}</span><span class="s2"> period.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Delete zip file after extraction</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local_zip_path</span><span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="find_point_cell">
+<a class="viewcode-back" href="../modules.html#intertidal_locator.find_point_cell">[docs]</a>
+<span class="k">def</span> <span class="nf">find_point_cell</span><span class="p">(</span><span class="n">lon</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> 
+                    <span class="n">lat</span><span class="p">:</span><span class="nb">float</span>
+                    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds which cell contains a single point (lon, lat).</span>
+
+<span class="sd">    The longitude must be between [-180,180] while the </span>
+<span class="sd">    latitude must be between [-60,60] (the whole earth </span>
+<span class="sd">    latitude is not covered, for more information refer to </span>
+<span class="sd">    http://dx.doi.org/10.1038/s41586-018-0805-8)</span>
+
+<span class="sd">    PARAMETERS</span>
+<span class="sd">    ----------</span>
+<span class="sd">        (float) lon: </span>
+<span class="sd">            Longitude of the point.</span>
+
+<span class="sd">        (float) lat: </span>
+<span class="sd">            Latitude of the point.</span>
+
+<span class="sd">    RETURNS</span>
+<span class="sd">    -------</span>
+<span class="sd">        (tuple[int,int]) cell_coord:</span>
+<span class="sd">            Tuple that represents the (cell_lon_min, </span>
+<span class="sd">            cell_lat_max) coordinate.</span>
+
+<span class="sd">    RAISES</span>
+<span class="sd">    ------</span>
+<span class="sd">        ValueError: </span>
+<span class="sd">            If the area is outside the valid latitude range </span>
+<span class="sd">            or if the longitude is not in valid format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check that lon and lat are in the available grid</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="o">-</span><span class="mi">180</span> <span class="o">&lt;=</span> <span class="n">lon</span> <span class="o">&lt;=</span> <span class="mi">180</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="mi">60</span> <span class="o">&gt;=</span> <span class="n">lat</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mi">60</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Point (</span><span class="si">{</span><span class="n">lon</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">lat</span><span class="si">}</span><span class="s2">) is not in &quot;</span>
+            <span class="s2">&quot;the available ranges [-180,180] and [-60,60].&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Find which cell of the grid contains the point</span>
+    <span class="n">cell_lon_min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="p">(</span><span class="n">lon</span><span class="o">//</span><span class="n">LON_STEP</span><span class="p">)</span> <span class="o">*</span> <span class="n">LON_STEP</span> <span class="p">)</span>
+    <span class="n">cell_lat_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">lat</span><span class="o">//</span><span class="n">LAT_STEP</span><span class="p">)</span> <span class="o">*</span> <span class="n">LAT_STEP</span> <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cell_lon_min</span><span class="p">,</span> <span class="n">cell_lat_max</span></div>
+
+
+
+
+<div class="viewcode-block" id="find_area_cells">
+<a class="viewcode-back" href="../modules.html#intertidal_locator.find_area_cells">[docs]</a>
+<span class="k">def</span> <span class="nf">find_area_cells</span><span class="p">(</span><span class="n">lon_min</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span>
+                    <span class="n">lon_max</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span>
+                    <span class="n">lat_min</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span>
+                    <span class="n">lat_max</span><span class="p">:</span><span class="nb">float</span>
+                    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds all cells that intersect with a given rectangle </span>
+<span class="sd">    area defined by its longitude and latitude boundaries.</span>
+
+<span class="sd">    The longitude must be between [-180,180] while the </span>
+<span class="sd">    latitude must be between [-60,60] (the whole earth </span>
+<span class="sd">    latitude is not covered, for more information refer to </span>
+<span class="sd">    http://dx.doi.org/10.1038/s41586-018-0805-8)</span>
+<span class="sd">    </span>
+<span class="sd">    PARAMETERS</span>
+<span class="sd">    ----------</span>
+<span class="sd">        (float) lon_min: </span>
+<span class="sd">            Minimum longitude of the area.</span>
+
+<span class="sd">        (float) lat_min: </span>
+<span class="sd">            Minimum latitude of the area.</span>
+
+<span class="sd">        (float) lon_max: </span>
+<span class="sd">            Maximum longitude of the area.</span>
+
+<span class="sd">        (float) lat_max: </span>
+<span class="sd">            Maximum latitude of the area.</span>
+<span class="sd">              </span>
+<span class="sd">    RETURNS</span>
+<span class="sd">    -------</span>
+<span class="sd">        (list[tuple[int,int]]) cells:</span>
+<span class="sd">            A list of tuples, where each tuple </span>
+<span class="sd">            represents the (cell_lon_min, cell_lat_max) </span>
+<span class="sd">            of a cell that intersects the area.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Find the range of cells in longitude and latitude</span>
+    <span class="n">lon_cell_min</span><span class="p">,</span> <span class="n">lat_cell_min</span> <span class="o">=</span> <span class="n">find_point_cell</span><span class="p">(</span>
+                                    <span class="n">lon_min</span><span class="p">,</span> <span class="n">lat_min</span><span class="p">)</span>
+    <span class="n">lon_cell_max</span><span class="p">,</span> <span class="n">lat_cell_max</span> <span class="o">=</span> <span class="n">find_point_cell</span><span class="p">(</span>
+                                    <span class="n">lon_max</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">)</span>
+    <span class="n">lat_cell_min</span> <span class="o">-=</span> <span class="n">LAT_STEP</span> <span class="c1"># a cell lat is its max</span>
+    
+    <span class="c1"># Browse all overlapping cells and keep those </span>
+    <span class="c1"># containing the area</span>
+    <span class="n">cells</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">lon</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lon_cell_min</span><span class="p">,</span> 
+                     <span class="n">lon_cell_max</span> <span class="o">+</span> <span class="n">LON_STEP</span><span class="p">,</span> 
+                     <span class="n">LON_STEP</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">lat</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lat_cell_min</span><span class="p">,</span> 
+                         <span class="n">lat_cell_max</span> <span class="o">+</span> <span class="n">LAT_STEP</span><span class="p">,</span> 
+                         <span class="n">LAT_STEP</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">lon</span> <span class="o">&lt;</span> <span class="n">lon_min</span> <span class="ow">or</span> <span class="n">lon</span> <span class="o">&lt;</span> <span class="n">lon_max</span><span class="p">)</span> 
+                <span class="ow">and</span> <span class="n">lat</span> <span class="o">&gt;</span> <span class="n">lat_min</span> <span class="ow">or</span> <span class="n">lat</span> <span class="o">&gt;</span> <span class="n">lat_max</span><span class="p">):</span>
+                <span class="n">cells</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">))</span>
+    
+    <span class="k">return</span> <span class="n">cells</span></div>
+
+
+
+
+<div class="viewcode-block" id="read_cell">
+<a class="viewcode-back" href="../modules.html#intertidal_locator.read_cell">[docs]</a>
+<span class="k">def</span> <span class="nf">read_cell</span><span class="p">(</span><span class="n">cell_lon_min</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> 
+              <span class="n">cell_lat_max</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> 
+              <span class="n">datadir</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> 
+              <span class="n">period</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;2014-2016&#39;</span>
+              <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads and returns a cell image file based on cell </span>
+<span class="sd">    coordinate.</span>
+
+<span class="sd">    PARAMETERS</span>
+<span class="sd">    ----------</span>
+<span class="sd">        (int) cell_lon_min: </span>
+<span class="sd">            Minimum longitude of the cell.</span>
+
+<span class="sd">        (int) cell_lat_max: </span>
+<span class="sd">            Maximum latitude of the cell.</span>
+
+<span class="sd">        (str) datadir: </span>
+<span class="sd">            Path to directory containing data.</span>
+
+<span class="sd">        (str) period=&#39;2014-2016&#39;: </span>
+<span class="sd">            The data period to read.</span>
+
+<span class="sd">    RETURNS</span>
+<span class="sd">    -------</span>
+<span class="sd">        (PIL.Image.Image) cell:</span>
+<span class="sd">            The image object read from the specified file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cell_lon_min</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">cell_lat_max</span><span class="si">}</span><span class="s2">.tif&quot;</span>
+    <span class="k">return</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                            <span class="n">datadir</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span></div>
+
+
+
+
+<div class="viewcode-block" id="crop_cell">
+<a class="viewcode-back" href="../modules.html#intertidal_locator.crop_cell">[docs]</a>
+<span class="k">def</span> <span class="nf">crop_cell</span><span class="p">(</span><span class="n">cell</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> 
+              <span class="n">cell_lon_min</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> 
+              <span class="n">cell_lat_max</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+              <span class="n">lon_min</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span>
+              <span class="n">lon_max</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span>
+              <span class="n">lat_min</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span>
+              <span class="n">lat_max</span><span class="p">:</span><span class="nb">float</span>
+              <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Crops the cell image to the specified area.</span>
+
+<span class="sd">    PARAMETERS</span>
+<span class="sd">    ----------</span>
+<span class="sd">        (PIL.Image.Image) cell: </span>
+<span class="sd">            The cell image to be cropped.</span>
+
+<span class="sd">        (int) cell_lon_min: </span>
+<span class="sd">            Minimum longitude of the cell.</span>
+
+<span class="sd">        (int) cell_lat_max: </span>
+<span class="sd">            Maximum latitude of the cell.</span>
+
+<span class="sd">        (float) lon_min: </span>
+<span class="sd">            Minimum longitude of the area.</span>
+
+<span class="sd">        (float) lat_min: </span>
+<span class="sd">            Minimum latitude of the area.</span>
+
+<span class="sd">        (float) lon_max: </span>
+<span class="sd">            Maximum longitude of the area.</span>
+
+<span class="sd">        (float) lat_max: </span>
+<span class="sd">            Maximum latitude of the area.</span>
+
+<span class="sd">    RETURNS</span>
+<span class="sd">    -------</span>
+<span class="sd">        (numpy.ndarray) cropped_cell_array:</span>
+<span class="sd">            The data read from the specified area of the </span>
+<span class="sd">            Image, as a numpy array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Modulo LON_STEP and LAT_STEP</span>
+    <span class="n">lon_min_rest</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lon_min</span> <span class="o">-</span> <span class="n">cell_lon_min</span><span class="p">)</span>
+    <span class="n">lon_max_rest</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">LON_STEP</span><span class="p">,</span> <span class="n">lon_max</span> <span class="o">-</span> <span class="n">cell_lon_min</span><span class="p">)</span>
+    <span class="n">lat_min_rest</span> <span class="o">=</span> <span class="n">cell_lat_max</span> <span class="o">-</span> <span class="n">lat_max</span>
+    <span class="n">lat_max_rest</span> <span class="o">=</span> <span class="n">cell_lat_max</span> <span class="o">-</span> <span class="n">lat_min</span>
+
+    <span class="c1"># Scale to translate from lon and lat to pixels</span>
+    <span class="n">lon_scale</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="n">LON_STEP</span>
+    <span class="n">lat_scale</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="n">LAT_STEP</span>
+    <span class="n">min_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lon_min_rest</span><span class="o">*</span><span class="n">lon_scale</span><span class="p">)</span>
+    <span class="n">max_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lon_max_rest</span><span class="o">*</span><span class="n">lon_scale</span><span class="p">)</span>
+    <span class="n">min_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lat_min_rest</span><span class="o">*</span><span class="n">lat_scale</span><span class="p">)</span>
+    <span class="n">max_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lat_max_rest</span><span class="o">*</span><span class="n">lat_scale</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="n">cell</span><span class="o">.</span><span class="n">crop</span><span class="p">((</span><span class="n">min_x</span><span class="p">,</span> <span class="n">min_y</span><span class="p">,</span> <span class="n">max_x</span><span class="p">,</span> <span class="n">max_y</span><span class="p">))</span>
+    <span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="merge_crops">
+<a class="viewcode-back" href="../modules.html#intertidal_locator.merge_crops">[docs]</a>
+<span class="k">def</span> <span class="nf">merge_crops</span><span class="p">(</span><span class="n">cropped_cell_arrays</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+               <span class="n">cell_coords</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">]]</span>
+               <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merges multiple cropped cell arrays into a single </span>
+<span class="sd">    array based on their spatial coordinates.</span>
+
+<span class="sd">    PARAMETERS</span>
+<span class="sd">    ----------</span>
+<span class="sd">        (list[numpy.ndarray]) cropped_cell_arrays: </span>
+<span class="sd">            A list of cropped cell arrays to be merged.</span>
+
+<span class="sd">        (list[tuple[int,int]]) cell_coords: </span>
+<span class="sd">            A list of tuples containing the cell </span>
+<span class="sd">            coordinate (cell_lon_min, cell_lat_max) </span>
+<span class="sd">            corresponding to each cropped cell array.</span>
+
+<span class="sd">    RETURNS</span>
+<span class="sd">    -------</span>
+<span class="sd">        (numpy.ndarray) merged_cropped_cell_array: </span>
+<span class="sd">            The merged array combining the cropped cell </span>
+<span class="sd">            arrays.</span>
+
+<span class="sd">    RAISES</span>
+<span class="sd">    ------</span>
+<span class="sd">        ValueError: </span>
+<span class="sd">            If the number of cell coordinates does not </span>
+<span class="sd">            match the number of cropped cell arrays or </span>
+<span class="sd">            if the list is empty.</span>
+
+<span class="sd">        NotImplementedError: </span>
+<span class="sd">            If the number of cropped cell arrays is not </span>
+<span class="sd">            1, 2, or 4. Not 3 because the area is a </span>
+<span class="sd">            rectangle. Not more because it would require </span>
+<span class="sd">            too much RAM for most use cases.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_coords</span><span class="p">)</span>
+    <span class="n">mcca</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># merged_cropped_cell_array</span>
+
+    <span class="c1"># Be sure that there are crops</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;empty cell_coordinates list&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">n</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cropped_cell_arrays</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;cropped_cell_arrays must have &quot;</span>
+                         <span class="s2">&quot;same the length &quot;</span>
+                         <span class="s2">&quot;as cell_coordinates&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Nothing to merge with 1 crop</span>
+    <span class="k">elif</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">mcca</span> <span class="o">=</span> <span class="n">cropped_cell_arrays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="c1"># Vertical or horizontal stack with 2 crops</span>
+    <span class="k">elif</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># Same lon means that it is a vertical stack</span>
+        <span class="k">if</span> <span class="n">cell_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">cell_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="c1"># Stack lower lat below higher lat</span>
+            <span class="k">if</span> <span class="n">cell_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">cell_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span> 
+                <span class="n">mcca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">cropped_cell_arrays</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mcca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">cropped_cell_arrays</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># Same lat means that it is an horizontal stack</span>
+        <span class="k">elif</span> <span class="n">cell_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">cell_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="c1"># Stack lower lon at the left of higher lon</span>
+            <span class="k">if</span> <span class="n">cell_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">cell_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span> 
+                <span class="n">mcca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">cropped_cell_arrays</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mcca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">cropped_cell_arrays</span><span class="p">)</span>
+    
+    <span class="c1"># Vertical stack of left side, then right side, </span>
+    <span class="c1"># and finally horizontal stack of left and right sides</span>
+    <span class="c1"># for 4 crops.</span>
+    <span class="k">elif</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="c1"># Find minimum lon and vertically stack them </span>
+        <span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lon</span> <span class="k">for</span> <span class="n">lon</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">cell_coords</span><span class="p">])</span>
+        <span class="n">min_lon_args</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">lons</span> <span class="o">==</span> <span class="n">lons</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+        <span class="n">left_side</span> <span class="o">=</span> <span class="n">merge_crops</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">cropped_cell_arrays</span><span class="p">[</span><span class="n">min_lon_args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span>
+                <span class="n">cropped_cell_arrays</span><span class="p">[</span><span class="n">min_lon_args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]]],</span>
+                <span class="p">[</span><span class="n">cell_coords</span><span class="p">[</span><span class="n">min_lon_args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span>
+                <span class="n">cell_coords</span><span class="p">[</span><span class="n">min_lon_args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]]])</span>
+        <span class="c1"># Do the same with maximum lon</span>
+        <span class="n">other_args</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">min_lon_args</span><span class="p">])</span>
+        <span class="n">right_side</span> <span class="o">=</span> <span class="n">merge_crops</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">cropped_cell_arrays</span><span class="p">[</span><span class="n">other_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                 <span class="n">cropped_cell_arrays</span><span class="p">[</span><span class="n">other_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]]],</span>
+                <span class="p">[</span><span class="n">cell_coords</span><span class="p">[</span><span class="n">other_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                 <span class="n">cell_coords</span><span class="p">[</span><span class="n">other_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]]])</span>
+        <span class="c1"># Horizontally stack left and right sides</span>
+        <span class="n">mcca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">left_side</span><span class="p">,</span> <span class="n">right_side</span><span class="p">])</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This function works &quot;</span>
+            <span class="s2">&quot;with 1, 2 or 4 crops. Not 3 because the area &quot;</span>
+            <span class="s2">&quot;is a rectangle. Not more because it would &quot;</span>
+            <span class="s2">&quot;require too much RAM for most use cases.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mcca</span></div>
+
+
+
+
+<div class="viewcode-block" id="get_intertidal_area">
+<a class="viewcode-back" href="../modules.html#intertidal_locator.get_intertidal_area">[docs]</a>
+<span class="k">def</span> <span class="nf">get_intertidal_area</span><span class="p">(</span><span class="n">lon_min</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span>
+                        <span class="n">lon_max</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span>
+                        <span class="n">lat_min</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span>
+                        <span class="n">lat_max</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> 
+                        <span class="n">datadir</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> 
+                        <span class="n">period</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;2014-2016&#39;</span>
+                        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves the intertidal area data for the specified </span>
+<span class="sd">    area.</span>
+
+<span class="sd">    The longitude must be between [-180,180] while the </span>
+<span class="sd">    latitude must be between [-60,60] (the whole earth </span>
+<span class="sd">    latitude is not covered, for more information refer to </span>
+<span class="sd">    http://dx.doi.org/10.1038/s41586-018-0805-8)</span>
+
+<span class="sd">    PARAMETERS</span>
+<span class="sd">    ----------</span>
+<span class="sd">        (float) lon_min: </span>
+<span class="sd">            Minimum longitude of the area.</span>
+
+<span class="sd">        (float) lat_min: </span>
+<span class="sd">            Minimum latitude of the area.</span>
+
+<span class="sd">        (float) lon_max: </span>
+<span class="sd">            Maximum longitude of the area.</span>
+
+<span class="sd">        (float) lat_max: </span>
+<span class="sd">            Maximum latitude of the area.</span>
+
+<span class="sd">        (str) datadir: </span>
+<span class="sd">            The directory path where the data files are </span>
+<span class="sd">            stored.</span>
+
+<span class="sd">        (str) period=&#39;2014-2016&#39;: </span>
+<span class="sd">            The data period to retrieve.</span>
+
+<span class="sd">    RETURNS</span>
+<span class="sd">    -------</span>
+<span class="sd">        (numpy.ndarray) intertidal_area: </span>
+<span class="sd">            The array representing the intertidal area for </span>
+<span class="sd">            the specified area.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cell_coords</span> <span class="o">=</span> <span class="n">find_area_cells</span><span class="p">(</span><span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">,</span>
+                                  <span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">)</span>
+    <span class="n">cropped_cell_arrays</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">cell_lon_min</span><span class="p">,</span> <span class="n">cell_lat_max</span> <span class="ow">in</span> <span class="n">cell_coords</span><span class="p">:</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="n">read_cell</span><span class="p">(</span><span class="n">cell_lon_min</span><span class="p">,</span> <span class="n">cell_lat_max</span><span class="p">,</span> 
+                         <span class="n">datadir</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">)</span>
+        <span class="n">cropped_cell</span> <span class="o">=</span> <span class="n">crop_cell</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">cell_lon_min</span><span class="p">,</span> 
+                                 <span class="n">cell_lat_max</span><span class="p">,</span> <span class="n">lon_min</span><span class="p">,</span>
+                                 <span class="n">lon_max</span><span class="p">,</span> <span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">)</span>
+        <span class="n">cropped_cell_arrays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cropped_cell</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">merge_crops</span><span class="p">(</span><span class="n">cropped_cell_arrays</span><span class="p">,</span> <span class="n">cell_coords</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, MIA lab, La Rochelle University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
